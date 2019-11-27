@@ -1,3 +1,37 @@
+class Move(object):
+    """
+    a class to contain a move and then play it on the board
+    """
+
+    def __init__(self, ind, chr, board):
+        self.ind = ind
+        self.chr = chr
+        self.board = board
+        for v in self.ind:
+            if v not in (0, 1, 2):
+                raise ValueError("Invalid move specification (0,1,2)")
+        if self.chr not in ('X', 'O'):
+            raise ValueError("Invalid character in move (X,O)")
+        if not isinstance(self.board, Board):
+            raise ValueError("Invalid Board passed in")
+
+    def checkAvailiable(self):
+        """
+        check that the proposed move is available on the board
+        :param board:
+        :return: True-available, False-non-available
+        """
+        return self.ind in self.board.availableSquares()
+
+    def __str__(self):
+        return "{}:({},{})".format(self.chr, *self.ind)
+
+    __repr__ = __str__
+
+    def __hash__(self):
+        return hash(str(self))
+
+
 class Board(object):
     """
     a board for tic-tac-toe
@@ -20,6 +54,29 @@ class Board(object):
         return "{}\n{}\n{}".format(*self.board)
 
     __repr__ = __str__
+
+    def whoseTurn(self):
+        """
+        X goes first always, whose turn now
+        :return:
+        """
+        nX = sum([1 for X in self.flatBoard if X == 'X'])
+        nO = sum([1 for X in self.flatBoard if X == 'O'])
+        if nX == nO:
+            return 'X'
+        else:
+            return 'O'
+
+    def executeMove(self, move):
+        """
+        Given a move execute it
+
+        :param move:
+        """
+        if move.checkAvailiable():
+            self.board[move.ind[0]][move.ind[1]] = move.chr
+        else:
+            raise ValueError("Invalid move attempted")
 
     @property
     def flatBoard(self):
