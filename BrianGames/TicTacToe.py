@@ -1,7 +1,22 @@
+import numpy as np
+
+
 class Move(object):
     """
     a class to contain a move and then play it on the board
     """
+
+    @classmethod
+    def randomMove(cls, board):
+        """
+        return a random move for the correct player
+        :param board:
+        :return:
+        """
+        turn = board.whoseTurn()
+        moves = board.availableSquares()
+        move = np.random.randint(0, len(moves))
+        return cls(moves[move], turn, board)
 
     def __init__(self, ind, chr, board):
         self.ind = ind
@@ -159,3 +174,24 @@ class Board(object):
             return False
         else:
             return 'D'
+
+
+class RandomGame(object):
+    """
+    play and collect a random game
+    """
+
+    def __init__(self):
+        self.board = Board()
+        self.moves = []
+        self.winner = None
+
+    def play(self, verbose=False):
+        while self.board.isWin() is False:
+            move = Move.randomMove(self.board)
+            if verbose:
+                print(self.board)
+                print(len(self.moves), move)
+            self.moves.append(move)
+            self.board.executeMove(move)
+        return self.board.isWin(), self.moves
