@@ -1,4 +1,6 @@
+
 import numpy as np
+import pandas as pd
 
 
 class Move(object):
@@ -195,3 +197,17 @@ class RandomGame(object):
             self.moves.append(move)
             self.board.executeMove(move)
         return self.board.isWin(), self.moves
+
+    @staticmethod
+    def playNow():
+        RG = RandomGame()
+        return RG.play()
+
+def randomStats(ngames=10000):
+    games = np.asarray([RandomGame.playNow()[0] for i in range(ngames)])
+    return pd.DataFrame.from_dict({'X': [(games == 'X').sum()],
+                         'O': [(games == 'O').sum()],
+                         'D': [(games == 'D').sum()] })
+
+def manyRandom(ngames=10000, niter=100):
+    return pd.concat([randomStats(ngames) for i in range(niter)]).reset_index(drop=True)
